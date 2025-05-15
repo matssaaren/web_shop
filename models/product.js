@@ -23,4 +23,6 @@ const Product = sequelize.define('product', {
   }
 });
 
+Product.getTableName = () => 'product';
+
 module.exports = Product;

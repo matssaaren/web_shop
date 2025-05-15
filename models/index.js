@@ -9,19 +9,26 @@ module.exports = (() => {
     const excludedFiles = ['.', '..', 'index.js'];
 
     for (const fileName of files) {
-      if (!excludedFiles.includes(fileName) && (path.extname(fileName) === '.js')) {
+      if (!excludedFiles.includes(fileName) && path.extname(fileName) === '.js') {
         const modelFile = require(path.join(__dirname, fileName));
         models[modelFile.getTableName()] = modelFile;
       }
     }
 
-    Object
-      .values(models)
-      .forEach(model => {
-        if (typeof model.associate === 'function') {
-          model.associate(models);
-        }
-      });
+    models.User = require('./user.js');
+    models.Product = require('./product.js');
+
+    models.User.hasMany(models.Product);
+    models.Product.belongsTo(models.User, {
+      constraints: true,
+      onDelete: 'CASCADE'
+    });
+
+    Object.values(models).forEach(model => {
+      if (typeof model.associate === 'function') {
+        model.associate(models);
+      }
+    });
 
     models.sequelize = sequelize;
   }
