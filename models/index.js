@@ -19,6 +19,15 @@ module.exports = (() => {
     models.Product = require('./product');
     models.Cart = require('./cart');
     models.CartItem = require('./cart-item');
+    models.Order = require('./order');
+    models.OrderItem = require('./order-item');
+
+    models.User.hasMany(models.Order);
+    models.Order.belongsTo(models.User);
+
+    models.Order.belongsToMany(models.Product, { through: models.OrderItem });
+    models.Product.belongsToMany(models.Order, { through: models.OrderItem });
+
 
     models.User.hasMany(models.Product);
     models.Product.belongsTo(models.User, { constraints: true, onDelete: 'CASCADE' });
