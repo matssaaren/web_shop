@@ -15,14 +15,19 @@ module.exports = (() => {
       }
     }
 
-    models.User = require('./user.js');
-    models.Product = require('./product.js');
+    models.User = require('./user');
+    models.Product = require('./product');
+    models.Cart = require('./cart');
+    models.CartItem = require('./cart-item');
 
     models.User.hasMany(models.Product);
-    models.Product.belongsTo(models.User, {
-      constraints: true,
-      onDelete: 'CASCADE'
-    });
+    models.Product.belongsTo(models.User, { constraints: true, onDelete: 'CASCADE' });
+
+    models.User.hasOne(models.Cart);
+    models.Cart.belongsTo(models.User);
+
+    models.Cart.belongsToMany(models.Product, { through: models.CartItem });
+    models.Product.belongsToMany(models.Cart, { through: models.CartItem });
 
     Object.values(models).forEach(model => {
       if (typeof model.associate === 'function') {

@@ -12,17 +12,18 @@ sequelize.models = models;
 
 sequelize
   .sync({ force: true })
-  .then(() => {
-    return models.User.findByPk(1);
-  })
+  .then(() => models.User.findByPk(1))
   .then(user => {
     if (!user) {
-      return models.User.create({
-        name: 'user',
-        email: 'user@local.com'
-      });
+      return models.User.create({ name: 'user', email: 'user@local.com' });
     }
     return user;
+  })
+  .then(user => {
+    return user.createCart().then(cart => {
+      console.log('Cart loodud:', cart.id);
+      return user;
+    });
   })
   .then(user => {
     app.use((req, res, next) => {
@@ -30,16 +31,11 @@ sequelize
       next();
     });
 
-    const productAdminRoutes = require('./routes/admin/products');
-    app.use('/admin', productAdminRoutes);
-
-    const productRoutes = require('./routes/products');
-    app.use(productRoutes);
+    const shopRoutes = require('./routes/shop');
+    app.use(shopRoutes);
 
     app.listen(3002, () => {
       console.log('Server töötab pordil 3002');
     });
   })
-  .catch(error => {
-    console.log(error);
-  });
+  .catch(err => console.error(err));
